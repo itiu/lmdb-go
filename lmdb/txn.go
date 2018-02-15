@@ -302,9 +302,16 @@ func (txn *Txn) renew() error {
 //
 // See mdb_dbi_open.
 func (txn *Txn) OpenDBI(name string, flags uint) (DBI, error) {
-	cname := C.CString(name)
+	var cname *C.char
+	if (name == "") {
+	    cname = nil
+	} else {
+	    cname = C.CString(name)
+	}
 	dbi, err := txn.openDBI(cname, flags)
-	C.free(unsafe.Pointer(cname))
+	if (cname != nil) {
+	    C.free(unsafe.Pointer(cname))
+	}
 	return dbi, err
 }
 
